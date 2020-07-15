@@ -1,0 +1,5 @@
+0 sexy
+1 cute
+2 ruggedly
+3 handsome
+4 ugly
