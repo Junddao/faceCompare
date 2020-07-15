@@ -29,6 +29,10 @@ class _ComparePageState extends State<ComparePage2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text("누가 더 잘생겼나?", style: TextStyle(color: Colors.black)),
+      ),
       body: _isLoading
           ? Container(
               alignment: Alignment.center,

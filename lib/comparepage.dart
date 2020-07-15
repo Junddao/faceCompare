@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -34,13 +35,8 @@ class _ComparePageState extends State<ComparePage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text("나의 외모 점수는?", style: TextStyle(color: Colors.black)),
-      ),
       body: _isLoading
           ? Container(
               alignment: Alignment.center,
@@ -51,6 +47,8 @@ class _ComparePageState extends State<ComparePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                // Appbar 높이만큼 띄우기
+                Padding(padding: EdgeInsets.only(top: statusBarHeight + 5)),
                 Expanded(
                   flex: 4,
                   child: Container(
@@ -78,20 +76,58 @@ class _ComparePageState extends State<ComparePage> {
                 //         "${_output[0]["confidence"]}")
               ],
             )),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
-        onPressed: () {
-          setState(() {
-            chooseImage();
-          });
-        },
-        child: Icon(Icons.image),
+      floatingActionButton: SpeedDial(
+        // both default to 16
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        // this is ignored if animatedIcon is non null
+        // child: Icon(Icons.add),
+        visible: true,
+        // If true user is forced to close dial manually
+        // by tapping main button and overlay is not rendered.
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        onOpen: () => print('OPENING DIAL'),
+        onClose: () => print('DIAL CLOSED'),
+        // tooltip: 'Speed Dial',
+        // heroTag: 'speed-dial-hero-tag',
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 8.0,
+        shape: CircleBorder(),
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.camera),
+            backgroundColor: Colors.red,
+            label: '카메라',
+            labelStyle: TextStyle(fontSize: 12.0),
+            onTap: () => setState(() {
+              chooseImage('camera');
+            }),
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.image),
+            backgroundColor: Colors.blue,
+            label: '갤러리',
+            labelStyle: TextStyle(fontSize: 12.0),
+            onTap: () => setState(() {
+              chooseImage('gallery');
+            }),
+          ),
+        ],
       ),
-    );
-  }
 
-  Widget displayComment(List output) {
-    if (output != null) {}
+      // FloatingActionButton(
+      //   backgroundColor: Colors.blue,
+      //   onPressed: () {
+      //     setState(() {
+      //       chooseImage();
+      //     });
+      //   },
+      //   child: Icon(Icons.image),
+    );
   }
 
   Widget percentIndicator(Size size, List output) {
@@ -140,10 +176,10 @@ class _ComparePageState extends State<ComparePage> {
                   totalScore + liResultScore[i] - (liResultScore[i] * 0.05);
             } else if (liResultTitle[i].contains('cute')) {
               totalScore =
-                  totalScore + liResultScore[i] - (liResultScore[i] * 0.07);
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.09);
             } else if (liResultTitle[i].contains('ruggedly')) {
               totalScore =
-                  totalScore + liResultScore[i] - (liResultScore[i] * 0.09);
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.05);
             } else if (liResultTitle[i].contains('handsome')) {
               totalScore += liResultScore[i];
             } else if (liResultTitle[i].contains('ugly')) {
@@ -325,8 +361,15 @@ class _ComparePageState extends State<ComparePage> {
     );
   }
 
-  chooseImage() async {
-    var image = await picker.getImage(source: ImageSource.gallery);
+  chooseImage(String select) async {
+    var image;
+    if (select == 'camera')
+      image = await picker.getImage(source: ImageSource.camera);
+    else if (select == 'gallery')
+      image = await picker.getImage(source: ImageSource.gallery);
+    else
+      image = null;
+
     if (image == null) return null;
     setState(() {
       _isLoading = true;
@@ -342,8 +385,8 @@ class _ComparePageState extends State<ComparePage> {
         // imageMean: 117.5,
         // imageStd: 0.1,
         // threshold: 0.1,
-        imageMean: 117.5, // defaults to 117.0
-        imageStd: 117.5, // defaults to 1.0
+        imageMean: 127.5, // defaults to 117.0
+        imageStd: 127.5, // defaults to 1.0
         numResults: 5, // defaults to 5
         threshold: 0.001, // defaults to 0.1
         asynch: true // defaults to true
