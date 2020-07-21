@@ -1,4 +1,5 @@
 import 'package:facecompare/comparepage.dart';
+import 'package:facecompare/comparepage2.dart';
 import 'package:flutter/material.dart';
 
 class SelectPage extends StatelessWidget {
@@ -37,7 +38,7 @@ class SelectPage extends StatelessWidget {
               ),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ComparePage()),
+                MaterialPageRoute(builder: (context) => ComparePage2()),
               ),
             ),
           ),

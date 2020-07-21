@@ -57,10 +57,29 @@ class _ComparePageState extends State<ComparePage> {
                     height: size.width,
                     child: _image == null
                         ? Container()
-                        : (Image.file(
-                            _image,
-                            fit: BoxFit.contain,
-                          )),
+                        : Stack(children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.file(
+                                _image,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            // Positioned(
+                            //   right: 0,
+                            //   bottom: size.width / 2,
+                            //   child: Container(
+                            //     width: size.width *0.7,
+                            //     height: size.width *0.2,
+                            //     decoration: BoxDecoration(
+                            //       color: Colors.white.withOpacity(0.9),
+                            //       borderRadius: BorderRadius.only(
+                            //         bottomLeft: Radius.circular(20),
+                            //         topLeft: Radius.circular(20),
+                            //       )
+                            //     ),
+                            //   ),)
+                          ]),
                   ),
                 ),
 
@@ -76,57 +95,13 @@ class _ComparePageState extends State<ComparePage> {
                 //         "${_output[0]["confidence"]}")
               ],
             )),
-      floatingActionButton: SpeedDial(
-        // both default to 16
-        animatedIcon: AnimatedIcons.menu_close,
-        animatedIconTheme: IconThemeData(size: 22.0),
-        // this is ignored if animatedIcon is non null
-        // child: Icon(Icons.add),
-        visible: true,
-        // If true user is forced to close dial manually
-        // by tapping main button and overlay is not rendered.
-        closeManually: false,
-        curve: Curves.bounceIn,
-        overlayColor: Colors.black,
-        overlayOpacity: 0.5,
-        onOpen: () => print('OPENING DIAL'),
-        onClose: () => print('DIAL CLOSED'),
-        // tooltip: 'Speed Dial',
-        // heroTag: 'speed-dial-hero-tag',
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 8.0,
-        shape: CircleBorder(),
-        children: [
-          SpeedDialChild(
-            child: Icon(Icons.camera),
-            backgroundColor: Colors.red,
-            label: '카메라',
-            labelStyle: TextStyle(fontSize: 12.0),
-            onTap: () => setState(() {
-              chooseImage('camera');
-            }),
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.image),
-            backgroundColor: Colors.blue,
-            label: '갤러리',
-            labelStyle: TextStyle(fontSize: 12.0),
-            onTap: () => setState(() {
-              chooseImage('gallery');
-            }),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        onPressed: () {
+          createAlertDialog(context);
+        },
+        child: Icon(Icons.image),
       ),
-
-      // FloatingActionButton(
-      //   backgroundColor: Colors.blue,
-      //   onPressed: () {
-      //     setState(() {
-      //       chooseImage();
-      //     });
-      //   },
-      //   child: Icon(Icons.image),
     );
   }
 
@@ -400,5 +375,46 @@ class _ComparePageState extends State<ComparePage> {
   loadModel() async {
     await Tflite.loadModel(
         model: "assets/model_unquant.tflite", labels: "assets/labels.txt");
+  }
+
+  createAlertDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Column(
+            // title: Text('Input Phone Number'),
+            // content: TextField(
+            //   controller: customController,
+            // ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              ButtonTheme(
+                minWidth: 200.0,
+                child: FlatButton(
+                  textColor: Colors.black,
+                  color: Colors.red[200],
+                  child: Text('카메라로 촬영'),
+                  onPressed: () {
+                    chooseImage('camera');
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              ButtonTheme(
+                minWidth: 200.0,
+                child: FlatButton(
+                  textColor: Colors.black,
+                  color: Colors.yellow,
+                  child: Text('갤러리에서 찾기'),
+                  onPressed: () {
+                    chooseImage('gallery');
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ],
+          );
+        });
   }
 }
