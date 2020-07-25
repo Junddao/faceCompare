@@ -29,7 +29,6 @@ class _ComparePageState extends State<ComparePage2> {
   String player2Result = '';
 
   bool tcVisibility = false;
-  bool bReset = false;
 
   @override
   void initState() {
@@ -63,10 +62,11 @@ class _ComparePageState extends State<ComparePage2> {
                     // Appbar 높이만큼 띄우기
                     Padding(padding: EdgeInsets.only(top: statusBarHeight + 5)),
                     Expanded(
-                      flex: 5,
+                      flex: 4,
                       child: Container(
                         alignment: Alignment.center,
-                        margin: EdgeInsets.only(bottom: 10),
+                        width: size.width,
+                        height: size.width,
                         child: _image1 == null
                             ? Container()
                             : Stack(children: <Widget>[
@@ -78,10 +78,18 @@ class _ComparePageState extends State<ComparePage2> {
                                   ),
                                 ),
                                 Positioned(
-                                  bottom: 0,
+                                  // right: 0,
+                                  // bottom: size.width * 0.1,
+                                  top: size.height * 0.1,
                                   child: Visibility(
                                     visible: tcVisibility,
                                     child: Container(
+                                        width: Image.file(_image1,
+                                                fit: BoxFit.contain)
+                                            .width,
+                                        height: Image.file(_image1,
+                                                fit: BoxFit.contain)
+                                            .height,
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.9),
                                         ),
@@ -89,7 +97,19 @@ class _ComparePageState extends State<ComparePage2> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: <Widget>[
-                                            getWinner(player1Result),
+                                            Text(
+                                              (player1Score * 100)
+                                                  .toStringAsFixed(2),
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              player1Result,
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           ],
                                         )),
                                   ),
@@ -98,40 +118,20 @@ class _ComparePageState extends State<ComparePage2> {
                       ),
                     ),
                     Expanded(
-                      flex: 2,
-                      child: Container(
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                //margin: EdgeInsets.only(top: 10),
-                                alignment: Alignment.topLeft,
-                                child: Visibility(
-                                  visible: tcVisibility,
-                                  child: getPlayer1Score(),
-                                ),
-                              ),
-                              Text('    VS    ',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w100)),
-                              Container(
-                                //margin: EdgeInsets.only(bottom: 10),
-                                alignment: Alignment.bottomRight,
-                                child: Visibility(
-                                  visible: tcVisibility,
-                                  child: getPlayer2Score(),
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                    Expanded(
-                      flex: 5,
+                      flex: 1,
                       child: Container(
                         alignment: Alignment.center,
-                        margin: EdgeInsets.only(top: 10),
+                        child: Text('VS',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: size.width,
+                        height: size.width,
                         child: _image2 == null
                             ? Container()
                             : Stack(children: <Widget>[
@@ -148,6 +148,12 @@ class _ComparePageState extends State<ComparePage2> {
                                   child: Visibility(
                                     visible: tcVisibility,
                                     child: Container(
+                                        width: Image.file(_image2,
+                                                fit: BoxFit.contain)
+                                            .width,
+                                        height: Image.file(_image2,
+                                                fit: BoxFit.contain)
+                                            .height,
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.9),
                                         ),
@@ -155,7 +161,19 @@ class _ComparePageState extends State<ComparePage2> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: <Widget>[
-                                            getWinner(player2Result),
+                                            Text(
+                                              (player2Score * 100)
+                                                  .toStringAsFixed(2),
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              player2Result,
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           ],
                                         )),
                                   ),
@@ -164,10 +182,12 @@ class _ComparePageState extends State<ComparePage2> {
                       ),
                     ),
                     Expanded(
-                      flex: 2,
-                      child: Container(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: resultButton(size),
+                      child: FlatButton(
+                        child: Text('결과 보기'),
+                        onPressed: () => setState(() {
+                          getResult(size);
+                          refreshScreen();
+                        }),
                       ),
                     )
                     // _output == null
@@ -183,7 +203,11 @@ class _ComparePageState extends State<ComparePage2> {
         // both default to 16
         animatedIcon: AnimatedIcons.menu_close,
         animatedIconTheme: IconThemeData(size: 22.0),
-        visible: !tcVisibility, //결과 출력되면 없애기
+        // this is ignored if animatedIcon is non null
+        // child: Icon(Icons.add),
+        visible: true,
+        // If true user is forced to close dial manually
+        // by tapping main button and overlay is not rendered.
         closeManually: false,
         curve: Curves.bounceIn,
         overlayColor: Colors.black,
@@ -224,6 +248,8 @@ class _ComparePageState extends State<ComparePage2> {
     List<double> liFaceScore = new List<double>();
     List<String> liFaceTitle = new List<String>();
 
+    double myBestScore = 0.0;
+
     double totalScore = 0.0;
 
     //이전 결과��� 초기화
@@ -232,9 +258,15 @@ class _ComparePageState extends State<ComparePage2> {
 
     liResultScore.add(0.0);
     liResultScore.add(0.0);
+    liResultScore.add(0.0);
+    liResultScore.add(0.0);
+    liResultScore.add(0.0);
 
-    liResultTitle.add("0 good");
-    liResultTitle.add("1 bad");
+    liResultTitle.add("0 sexy");
+    liResultTitle.add("1 cute");
+    liResultTitle.add("2 ruggedly");
+    liResultTitle.add("3 handsome");
+    liResultTitle.add("4 ugly");
 
     // 결과값 가져와서
     if (output != null) {
@@ -243,25 +275,35 @@ class _ComparePageState extends State<ComparePage2> {
         liFaceTitle.add(_output[i]["label"]);
         liFaceScore.add(_output[i]["confidence"]);
       }
-      // 결과값 가져와서
-      if (output != null) {
-        List _output = output;
-        for (int i = 0; i < _output.length; i++) {
-          liFaceTitle.add(_output[i]["label"]);
-          liFaceScore.add(_output[i]["confidence"]);
-        }
-        //출력 리스트에 복사
-        for (int i = 0; i < liResultTitle.length; i++) {
-          for (int j = 0; j < liFaceTitle.length; j++) {
-            if (liResultTitle[i] == liFaceTitle[j]) {
-              liResultScore[i] = liFaceScore[j];
+      //출력 리스트에 복사
+      for (int i = 0; i < liResultTitle.length; i++) {
+        for (int j = 0; j < liFaceTitle.length; j++) {
+          if (liResultTitle[i] == liFaceTitle[j]) {
+            liResultScore[i] = liFaceScore[j];
+            if (liResultScore[i] > myBestScore) {
+              myBestScore = liResultScore[i];
             }
+            if (liResultTitle[i].contains('sexy')) {
+              totalScore =
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.05);
+            } else if (liResultTitle[i].contains('cute')) {
+              totalScore =
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.09);
+            } else if (liResultTitle[i].contains('ruggedly')) {
+              totalScore =
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.05);
+            } else if (liResultTitle[i].contains('handsome')) {
+              totalScore += liResultScore[i];
+            } else if (liResultTitle[i].contains('ugly')) {
+              totalScore -= liResultScore[i] / 20;
+              if (totalScore < 0) totalScore = 0;
+            }
+
+            break;
           }
         }
       }
     }
-
-    totalScore = liResultScore[0]; // good score
     return totalScore;
   }
 
@@ -299,7 +341,7 @@ class _ComparePageState extends State<ComparePage2> {
         // threshold: 0.1,
         imageMean: 127.5, // defaults to 117.0
         imageStd: 127.5, // defaults to 1.0
-        numResults: 2, // defaults to 5
+        numResults: 5, // defaults to 5
         threshold: 0.001, // defaults to 0.1
         asynch: true // defaults to true
         );
@@ -376,84 +418,5 @@ class _ComparePageState extends State<ComparePage2> {
             ],
           );
         });
-  }
-
-  void initScreen() {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => ComparePage2(),
-        transitionDuration: Duration.zero,
-      ),
-    );
-  }
-
-  Widget getPlayer1Score() {
-    double player1resultScore = player1Score / player2Score * 100 / 2;
-
-    return Text(player1resultScore.toStringAsFixed(1),
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200));
-  }
-
-  Widget getPlayer2Score() {
-    double player2resultScore = player2Score / player1Score * 100 / 2;
-
-    return Text(player2resultScore.toStringAsFixed(1),
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200));
-  }
-
-  Widget getWinner(playerResult) {
-    Color resultColor;
-
-    if (playerResult == 'WIN')
-      resultColor = Colors.blue;
-    else
-      resultColor = Colors.red;
-    return Text(
-      playerResult,
-      style: TextStyle(
-          fontSize: 40, fontWeight: FontWeight.bold, color: resultColor),
-    );
-  }
-
-  Widget resultButton(Size size) {
-    String buttonName;
-    Color buttonColor;
-
-    String selectMode;
-
-    if (_output1 == null || _output2 == null) {
-      buttonName = 'Select Image  →';
-      buttonColor = Colors.black;
-      selectMode = 'select';
-    } else {
-      if (bReset == false) {
-        buttonName = 'Go!';
-        buttonColor = Colors.blue;
-        selectMode = 'go';
-      } else {
-        buttonName = 'Retry!';
-        buttonColor = Colors.red;
-        selectMode = 'retry';
-      }
-    }
-    return OutlineButton(
-      shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(10.0)),
-      child: Text(buttonName,
-          style: TextStyle(
-              fontSize: 20, color: buttonColor, fontWeight: FontWeight.w200)),
-      onPressed: () => setState(() {
-        if (selectMode == 'go') {
-          bReset = true;
-          getResult(size);
-          refreshScreen();
-        }
-        if (selectMode == 'retry') {
-          bReset = false;
-          initScreen();
-        }
-      }),
-    );
   }
 }

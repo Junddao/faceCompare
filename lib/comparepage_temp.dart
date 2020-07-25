@@ -49,7 +49,7 @@ class _ComparePageState extends State<ComparePage> {
                 // Appbar 높이만큼 띄우기
                 Padding(padding: EdgeInsets.only(top: statusBarHeight + 5)),
                 Expanded(
-                  flex: 6,
+                  flex: 4,
                   child: Container(
                     alignment: Alignment.center,
                     width: size.width,
@@ -64,12 +64,26 @@ class _ComparePageState extends State<ComparePage> {
                                 fit: BoxFit.contain,
                               ),
                             ),
+                            // Positioned(
+                            //   right: 0,
+                            //   bottom: size.width / 2,
+                            //   child: Container(
+                            //     width: size.width *0.7,
+                            //     height: size.width *0.2,
+                            //     decoration: BoxDecoration(
+                            //       color: Colors.white.withOpacity(0.9),
+                            //       borderRadius: BorderRadius.only(
+                            //         bottomLeft: Radius.circular(20),
+                            //         topLeft: Radius.circular(20),
+                            //       )
+                            //     ),
+                            //   ),)
                           ]),
                   ),
                 ),
 
                 Expanded(
-                  flex: 4,
+                  flex: 6,
                   child: percentIndicator(size, _output),
                 )
 
@@ -94,7 +108,10 @@ class _ComparePageState extends State<ComparePage> {
     List<double> liFaceScore = new List<double>();
     List<String> liFaceTitle = new List<String>();
 
+    double myBestScore = 0.0;
+    String myStyle;
     String comment = "사진을 선택하세요.";
+    double totalScore = 0.0;
 
     //이전 결과값 초기화
     liResultScore.clear();
@@ -102,9 +119,15 @@ class _ComparePageState extends State<ComparePage> {
 
     liResultScore.add(0.0);
     liResultScore.add(0.0);
+    liResultScore.add(0.0);
+    liResultScore.add(0.0);
+    liResultScore.add(0.0);
 
-    liResultTitle.add("0 good");
-    liResultTitle.add("1 bad");
+    liResultTitle.add("0 sexy");
+    liResultTitle.add("1 cute");
+    liResultTitle.add("2 ruggedly");
+    liResultTitle.add("3 handsome");
+    liResultTitle.add("4 ugly");
 
     // 결과값 가져와서
     if (output != null) {
@@ -118,24 +141,53 @@ class _ComparePageState extends State<ComparePage> {
         for (int j = 0; j < liFaceTitle.length; j++) {
           if (liResultTitle[i] == liFaceTitle[j]) {
             liResultScore[i] = liFaceScore[j];
+            if (liResultScore[i] > myBestScore) {
+              myBestScore = liResultScore[i];
+              myStyle = liResultTitle[i];
+            }
+            if (liResultTitle[i].contains('sexy')) {
+              totalScore =
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.05);
+            } else if (liResultTitle[i].contains('cute')) {
+              totalScore =
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.09);
+            } else if (liResultTitle[i].contains('ruggedly')) {
+              totalScore =
+                  totalScore + liResultScore[i] - (liResultScore[i] * 0.05);
+            } else if (liResultTitle[i].contains('handsome')) {
+              totalScore += liResultScore[i];
+            } else if (liResultTitle[i].contains('ugly')) {
+              totalScore -= liResultScore[i] / 20;
+              if (totalScore < 0) totalScore = 0;
+            }
+
+            break;
           }
         }
       }
-      if (liResultScore[0] > 0.9) {
-        comment = '굉장히 잘생겼어요!! \n장동건, 현빈, 원빈 등급 입니다.';
-      } else if (liResultScore[0] > 0.7 && liResultScore[0] <= 0.9) {
-        comment = '훈훈한 외모의 소유자!! \n박보검, 박서준, 조승우 등급 입니다.';
-      } else if (liResultScore[0] > 0.5 && liResultScore[0] <= 0.7) {
-        comment = '평균 이상의 외모이십니다. \n음... 잘생긴 일반인??';
-      } else if (liResultScore[0] > 0.3 && liResultScore[0] <= 0.5) {
-        comment = '평균 이하의 외모를 가지셨습니다. \n거울은 거짓말을 하지 않아요.';
-      } else {
-        comment = '그냥 못생겼어요. \n사진이 잘못 됐을수도 있으니 \n다시 찍어보세요.';
+      if (myStyle.contains('sexy')) {
+        comment = '당신은 섹시한 스타일 입니다.\n닮은 연애인은 서강준, 서인국, 유아인 등이 있습니다.';
+      } else if (myStyle.contains('cute')) {
+        comment = '당신은 귀여운 스타일 입니다.\n닮은 연예인은 박보검, 피오, 헨리 등이 있습니다.';
+      } else if (myStyle.contains('ruggedly')) {
+        comment = '당신은 남자다운 스타일 입니다.\n닮은 연예인은 고수, 소지섭, 송승헌 등이 있습니다.';
+      } else if (myStyle.contains('handsome')) {
+        comment = '당신은 잘생겼습니다.\n닮은 연예인은 장동건, 원빈, 강동원, 정우성, 현빈 등이 있습니다.';
+      } else if (myStyle.contains('ugly')) {
+        comment = '당신은 못생겼습니다.';
       }
     }
 
     return new SingleChildScrollView(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text((totalScore * 100).toStringAsFixed(1) + "점",
+                style: new TextStyle(
+                    fontSize: 30.0, fontWeight: FontWeight.bold))),
+        SizedBox(
+          height: 10,
+        ),
         Padding(
             padding: EdgeInsets.all(10.0),
             child: Text(comment,
@@ -146,28 +198,23 @@ class _ComparePageState extends State<ComparePage> {
           children: [
             Padding(
                 padding: EdgeInsets.all(10.0),
-                child: Text("Good",
+                child: Text("섹시함",
                     style: new TextStyle(
-                        foreground: Paint()..color = Colors.blue[500],
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold))),
+                        fontSize: 15.0, fontWeight: FontWeight.bold))),
             Padding(
               padding: EdgeInsets.all(10.0),
               child: new LinearPercentIndicator(
-                width: size.width * 0.6,
+                width: size.width * 0.5,
                 animationDuration: 1000,
-                lineHeight: 30,
+                lineHeight: 20,
                 percent: liResultScore[0],
                 linearStrokeCap: LinearStrokeCap.roundAll,
                 center: Text(
                   (liResultScore[0] * 100).toStringAsFixed(1) + "%",
                   style: new TextStyle(
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                      fontSize: 15.0, fontWeight: FontWeight.bold),
                 ),
-                progressColor: Colors.blue[500],
+                progressColor: Colors.brown[300],
               ),
             ),
           ],
@@ -177,29 +224,109 @@ class _ComparePageState extends State<ComparePage> {
           children: [
             Padding(
               padding: EdgeInsets.all(10.0),
-              child: Text("Ugly",
+              child: Text("귀여움",
                   style: new TextStyle(
-                      color: Colors.red[500],
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold)),
+                      fontSize: 15.0, fontWeight: FontWeight.bold)),
             ),
             Padding(
               padding: EdgeInsets.all(10.0),
               child: new LinearPercentIndicator(
-                width: size.width * 0.6,
+                width: size.width * 0.5,
                 animation: true,
                 animationDuration: 1000,
-                lineHeight: 30,
+                lineHeight: 20,
                 percent: liResultScore[1],
                 linearStrokeCap: LinearStrokeCap.roundAll,
                 center: Text(
                   (liResultScore[1] * 100).toStringAsFixed(1) + "%",
                   style: new TextStyle(
-                      color: Colors.white,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.bold),
+                      fontSize: 15.0, fontWeight: FontWeight.bold),
                 ),
-                progressColor: Colors.red[500],
+                progressColor: Colors.yellow[300],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text("남성미",
+                  style: new TextStyle(
+                      fontSize: 15.0, fontWeight: FontWeight.bold)),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new LinearPercentIndicator(
+                width: size.width * 0.5,
+                animation: true,
+                animationDuration: 1000,
+                lineHeight: 20,
+                percent: liResultScore[2],
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                center: Text(
+                  (liResultScore[2] * 100).toStringAsFixed(1) + "%",
+                  style: new TextStyle(
+                      fontSize: 15.0, fontWeight: FontWeight.bold),
+                ),
+                progressColor: Colors.green[300],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text("잘생김",
+                  style: new TextStyle(
+                      fontSize: 15.0, fontWeight: FontWeight.bold)),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new LinearPercentIndicator(
+                width: size.width * 0.5,
+                animation: true,
+                animationDuration: 1000,
+                lineHeight: 20,
+                percent: liResultScore[3],
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                center: Text(
+                  (liResultScore[3] * 100).toStringAsFixed(1) + "%",
+                  style: new TextStyle(
+                      fontSize: 15.0, fontWeight: FontWeight.bold),
+                ),
+                progressColor: Colors.blue[300],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text("못생김",
+                  style: new TextStyle(
+                      fontSize: 15.0, fontWeight: FontWeight.bold)),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: new LinearPercentIndicator(
+                width: size.width * 0.5,
+                animation: true,
+                animationDuration: 1000,
+                lineHeight: 20,
+                percent: liResultScore[4],
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                center: Text(
+                  (liResultScore[4] * 100).toStringAsFixed(1) + "%",
+                  style: new TextStyle(
+                      fontSize: 15.0, fontWeight: FontWeight.bold),
+                ),
+                progressColor: Colors.red[300],
               ),
             ),
           ],
@@ -234,7 +361,7 @@ class _ComparePageState extends State<ComparePage> {
         // threshold: 0.1,
         imageMean: 127.5, // defaults to 117.0
         imageStd: 127.5, // defaults to 1.0
-        numResults: 2, // defaults to 5
+        numResults: 5, // defaults to 5
         threshold: 0.001, // defaults to 0.1
         asynch: true // defaults to true
         );

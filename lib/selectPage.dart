@@ -20,8 +20,11 @@ class SelectPage extends StatelessWidget {
             alignment: Alignment.center,
             child: FlatButton(
               child: Text(
-                "혼자하기",
-                style: TextStyle(fontSize: 50),
+                "Single play",
+                style: TextStyle(
+                    fontSize: 50,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w200),
               ),
               onPressed: () => Navigator.push(
                 context,
@@ -33,8 +36,11 @@ class SelectPage extends StatelessWidget {
             alignment: Alignment.center,
             child: FlatButton(
               child: Text(
-                "친구와 비교하기",
-                style: TextStyle(fontSize: 50),
+                "VS Mode",
+                style: TextStyle(
+                    fontSize: 50,
+                    color: Colors.red,
+                    fontWeight: FontWeight.w100),
               ),
               onPressed: () => Navigator.push(
                 context,
