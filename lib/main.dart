@@ -1,10 +1,24 @@
-import 'package:facecompare/constants.dart';
 import 'package:facecompare/rootpage.dart';
+import 'package:facecompare/service/admob_service.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:splashscreen/splashscreen.dart';
 
 void main() {
+  // admob 광고 초기화
+  WidgetsFlutterBinding.ensureInitialized();
+  FirebaseAdMob.instance
+      .initialize(appId: AdMobService().getInterstitialAdId());
+
+  // 폰트 라이센스 등록
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('google_fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
+
   runApp(new MaterialApp(
     home: FaceCompare(),
   ));
@@ -68,9 +82,10 @@ class AfterSplash extends StatelessWidget {
     // permission();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: new ThemeData(
-        textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+      theme: ThemeData(
+        textTheme: GoogleFonts.gothicA1TextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       home: RootPage(),
     );

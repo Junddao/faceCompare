@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
+import 'service/admob_service.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 class ComparePage2 extends StatefulWidget {
   @override
@@ -10,6 +12,8 @@ class ComparePage2 extends StatefulWidget {
 }
 
 class _ComparePageState extends State<ComparePage2> {
+  final ams = AdMobService();
+
   bool _isLoading;
   File _image1;
   File _image2;
@@ -389,14 +393,22 @@ class _ComparePageState extends State<ComparePage2> {
   }
 
   Widget getPlayer1Score() {
-    double player1resultScore = player1Score / player2Score * 100 / 2;
+    double player1resultScore;
+    if (player2Score == 0)
+      player1resultScore = 100;
+    else
+      player1resultScore = player1Score / player2Score * 100 / 2;
 
     return Text(player1resultScore.toStringAsFixed(1),
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200));
   }
 
   Widget getPlayer2Score() {
-    double player2resultScore = player2Score / player1Score * 100 / 2;
+    double player2resultScore;
+    if (player1Score == 0)
+      player2resultScore = 100;
+    else
+      player2resultScore = player2Score / player1Score * 100 / 2;
 
     return Text(player2resultScore.toStringAsFixed(1),
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200));
@@ -417,13 +429,16 @@ class _ComparePageState extends State<ComparePage2> {
   }
 
   Widget resultButton(Size size) {
+    InterstitialAd newAd = ams.getNewInterstitial();
+    newAd.load();
+
     String buttonName;
     Color buttonColor;
-
     String selectMode;
 
     if (_output1 == null || _output2 == null) {
-      buttonName = 'Select Image  →';
+      // buttonName = 'Select Image  →→';
+      buttonName = 'Welcome   : )';
       buttonColor = Colors.black;
       selectMode = 'select';
     } else {
@@ -438,22 +453,32 @@ class _ComparePageState extends State<ComparePage2> {
       }
     }
     return OutlineButton(
-      shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(10.0)),
-      child: Text(buttonName,
-          style: TextStyle(
-              fontSize: 20, color: buttonColor, fontWeight: FontWeight.w200)),
-      onPressed: () => setState(() {
-        if (selectMode == 'go') {
-          bReset = true;
-          getResult(size);
-          refreshScreen();
-        }
-        if (selectMode == 'retry') {
-          bReset = false;
-          initScreen();
-        }
-      }),
-    );
+        shape: new RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(10.0)),
+        child: Text(buttonName,
+            style: TextStyle(
+                fontSize: 20, color: buttonColor, fontWeight: FontWeight.w200)),
+        onPressed: () async {
+          if (selectMode == 'go') {
+            newAd.show(
+              anchorType: AnchorType.bottom,
+              anchorOffset: 0.0,
+              horizontalCenterOffset: 0.0,
+            );
+
+            bReset = true;
+
+            Future.delayed(Duration(seconds: 3), () {
+              setState(() {
+                getResult(size);
+                refreshScreen();
+              });
+            });
+            //
+          } else if (selectMode == 'retry') {
+            bReset = false;
+            initScreen();
+          }
+        });
   }
 }

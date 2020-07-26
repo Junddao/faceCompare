@@ -140,7 +140,7 @@ class _ComparePageState extends State<ComparePage> {
             padding: EdgeInsets.all(10.0),
             child: Text(comment,
                 style: new TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.bold))),
+                    fontSize: 15.0, fontWeight: FontWeight.w200))),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -150,7 +150,7 @@ class _ComparePageState extends State<ComparePage> {
                     style: new TextStyle(
                         foreground: Paint()..color = Colors.blue[500],
                         fontSize: 18.0,
-                        fontWeight: FontWeight.bold))),
+                        fontWeight: FontWeight.w300))),
             Padding(
               padding: EdgeInsets.all(10.0),
               child: new LinearPercentIndicator(
@@ -163,7 +163,7 @@ class _ComparePageState extends State<ComparePage> {
                   (liResultScore[0] * 100).toStringAsFixed(1) + "%",
                   style: new TextStyle(
                     fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w300,
                     color: Colors.white,
                   ),
                 ),
@@ -181,7 +181,7 @@ class _ComparePageState extends State<ComparePage> {
                   style: new TextStyle(
                       color: Colors.red[500],
                       fontSize: 18.0,
-                      fontWeight: FontWeight.bold)),
+                      fontWeight: FontWeight.w300)),
             ),
             Padding(
               padding: EdgeInsets.all(10.0),
@@ -197,7 +197,7 @@ class _ComparePageState extends State<ComparePage> {
                   style: new TextStyle(
                       color: Colors.white,
                       fontSize: 15.0,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.w300),
                 ),
                 progressColor: Colors.red[500],
               ),
