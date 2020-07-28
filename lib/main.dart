@@ -62,15 +62,15 @@ class _MyHomePageState extends State<MyHomePage> {
         style: new TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 20.0,
-          color: Colors.white,
+          color: Colors.black,
         ),
       ),
 
-      backgroundColor: Colors.grey[600],
+      backgroundColor: Colors.white,
       styleTextUnderTheLoader: new TextStyle(
-          fontSize: 12.0, fontWeight: FontWeight.bold, color: Colors.white),
+          fontSize: 12.0, fontWeight: FontWeight.bold, color: Colors.black),
       photoSize: 100.0,
-      loaderColor: Colors.white,
+      loaderColor: Colors.black,
       //loadingText: Text('Now Loading'),
     );
   }

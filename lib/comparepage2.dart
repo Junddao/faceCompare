@@ -7,6 +7,9 @@ import 'service/admob_service.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 
 class ComparePage2 extends StatefulWidget {
+  final int selectedGender;
+
+  ComparePage2({Key key, @required this.selectedGender}) : super(key: key);
   @override
   _ComparePageState createState() => _ComparePageState();
 }
@@ -19,6 +22,9 @@ class _ComparePageState extends State<ComparePage2> {
   File _image2;
   List _output1;
   List _output2;
+
+  String mlModel;
+  String mlLabel;
 
   final picker = ImagePicker();
 
@@ -38,6 +44,13 @@ class _ComparePageState extends State<ComparePage2> {
   @override
   void initState() {
     super.initState();
+    if (widget.selectedGender == 1) {
+      mlModel = "assets/model_unquant1.tflite";
+      mlLabel = "assets/labels1.txt";
+    } else if (widget.selectedGender == 2) {
+      mlModel = "assets/model_unquant2.tflite";
+      mlLabel = "assets/labels2.txt";
+    }
     _isLoading = true;
     loadModel().then((value) {
       setState(() {
@@ -317,8 +330,7 @@ class _ComparePageState extends State<ComparePage2> {
   }
 
   loadModel() async {
-    await Tflite.loadModel(
-        model: "assets/model_unquant.tflite", labels: "assets/labels.txt");
+    await Tflite.loadModel(model: mlModel, labels: mlLabel);
   }
 
   getResult(Size size) {
@@ -386,7 +398,9 @@ class _ComparePageState extends State<ComparePage2> {
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => ComparePage2(),
+        pageBuilder: (_, __, ___) => ComparePage2(
+          selectedGender: widget.selectedGender,
+        ),
         transitionDuration: Duration.zero,
       ),
     );
@@ -394,10 +408,13 @@ class _ComparePageState extends State<ComparePage2> {
 
   Widget getPlayer1Score() {
     double player1resultScore;
-    if (player2Score == 0)
+    double temp = 100 / (player1Score + player2Score);
+    if (player1Score == player2Score) {
+      player1resultScore = 50;
+    } else if (player2Score == 0) {
       player1resultScore = 100;
-    else
-      player1resultScore = player1Score / player2Score * 100 / 2;
+    } else
+      player1resultScore = player1Score * temp;
 
     return Text(player1resultScore.toStringAsFixed(1),
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200));
@@ -405,10 +422,14 @@ class _ComparePageState extends State<ComparePage2> {
 
   Widget getPlayer2Score() {
     double player2resultScore;
-    if (player1Score == 0)
+    double temp = 100 / (player1Score + player2Score);
+    if (player1Score == player2Score) {
+      player2resultScore = 50;
+    } else if (player1Score == 0) {
       player2resultScore = 100;
-    else
-      player2resultScore = player2Score / player1Score * 100 / 2;
+    } else {
+      player2resultScore = player2Score * temp;
+    }
 
     return Text(player2resultScore.toStringAsFixed(1),
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200));
@@ -443,18 +464,18 @@ class _ComparePageState extends State<ComparePage2> {
       selectMode = 'select';
     } else {
       if (bReset == false) {
-        buttonName = 'Go!';
+        buttonName = '눌러서 결과확인';
         buttonColor = Colors.blue;
         selectMode = 'go';
       } else {
-        buttonName = 'Retry!';
+        buttonName = '다시 하기';
         buttonColor = Colors.red;
         selectMode = 'retry';
       }
     }
-    return OutlineButton(
-        shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(10.0)),
+    return FlatButton(
+        // shape: new RoundedRectangleBorder(
+        //     borderRadius: new BorderRadius.circular(10.0)),
         child: Text(buttonName,
             style: TextStyle(
                 fontSize: 20, color: buttonColor, fontWeight: FontWeight.w200)),
@@ -468,7 +489,7 @@ class _ComparePageState extends State<ComparePage2> {
 
             bReset = true;
 
-            Future.delayed(Duration(seconds: 3), () {
+            Future.delayed(Duration(seconds: 2), () {
               setState(() {
                 getResult(size);
                 refreshScreen();
