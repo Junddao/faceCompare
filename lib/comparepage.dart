@@ -138,7 +138,7 @@ class _ComparePageState extends State<ComparePage> {
         }
       }
       if (liResultScore[0] > 0.9) {
-        comment = '개잘생김! >_<';
+        comment = '상위 10% 입니다. 부럽네요! >_<';
       } else if (liResultScore[0] > 0.7 && liResultScore[0] <= 0.9) {
         comment = '여자 꽤 울리셨겠어~ ^_^';
       } else if (liResultScore[0] > 0.5 && liResultScore[0] <= 0.7) {
@@ -146,7 +146,7 @@ class _ComparePageState extends State<ComparePage> {
       } else if (liResultScore[0] > 0.3 && liResultScore[0] <= 0.5) {
         comment = '그저 그래 -_-';
       } else {
-        comment = '못생겼어 ㅠ_ㅠ';
+        comment = '김 묻었어요. 못생김! ㅠ_ㅠ';
       }
     }
 
@@ -166,7 +166,7 @@ class _ComparePageState extends State<ComparePage> {
                   text: [
                     comment,
                   ],
-                  textStyle: TextStyle(fontSize: 30.0, fontFamily: "Agne"),
+                  textStyle: TextStyle(fontSize: 25.0, fontFamily: "Agne"),
                   textAlign: TextAlign.start,
                   alignment:
                       AlignmentDirectional.topStart // or Alignment.topLeft
@@ -183,7 +183,7 @@ class _ComparePageState extends State<ComparePage> {
                     children: [
                       Padding(
                           padding: EdgeInsets.all(10.0),
-                          child: Text("^__^ (Good)",
+                          child: Text("Good",
                               style: new TextStyle(
                                   foreground: Paint()..color = Colors.blue[500],
                                   fontSize: 18.0,
@@ -214,7 +214,7 @@ class _ComparePageState extends State<ComparePage> {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(10.0),
-                        child: Text("ㅠ_ㅠ (Ugly)",
+                        child: Text("Bad",
                             style: new TextStyle(
                                 color: Colors.red[500],
                                 fontSize: 18.0,

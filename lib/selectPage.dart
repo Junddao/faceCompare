@@ -1,8 +1,12 @@
 import 'package:facecompare/comparepage.dart';
 import 'package:facecompare/comparepage2.dart';
+import 'package:facecompare/data/appbarcontents.dart';
+import 'package:facecompare/getContactsPage.dart';
 import 'package:facecompare/manualpage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:gender_selection/gender_selection.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SelectPage extends StatefulWidget {
   @override
@@ -11,6 +15,9 @@ class SelectPage extends StatefulWidget {
 
 // ignore: must_be_immutable
 class _SelectPageState extends State<SelectPage> {
+  String _url =
+      'https://play.google.com/store/apps/details?id=com.jtb.facecompare';
+  String friendPhoneNumber;
   int selectedGender = 0; // 1 : man, 2 : women
 
   @override
@@ -23,9 +30,23 @@ class _SelectPageState extends State<SelectPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        title: Text("선택", style: TextStyle(color: Colors.black)),
         elevation: 0,
-        title: Text("Face Compare", style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        iconTheme: IconThemeData(color: Colors.black),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+              onSelected: choiceAction,
+              itemBuilder: (BuildContext context) {
+                return AppBarContants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              }),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,6 +61,9 @@ class _SelectPageState extends State<SelectPage> {
                 Colors.green,
               ],
             ),
+            femaleImage: AssetImage("assets/images/female.png"),
+            maleImage: AssetImage("assets/images/male.png"),
+
             selectedGenderIconBackgroundColor: Colors.indigo, // default red
             checkIconAlignment: Alignment.centerRight, // default bottomRight
             selectedGenderCheckIcon: null, // default Icons.check
@@ -59,7 +83,7 @@ class _SelectPageState extends State<SelectPage> {
             alignment: Alignment.center,
             child: FlatButton(
               child: Text(
-                "Single play",
+                "싱글 모드",
                 style: TextStyle(
                     fontSize: 30,
                     color: Colors.blue,
@@ -79,7 +103,7 @@ class _SelectPageState extends State<SelectPage> {
             alignment: Alignment.center,
             child: FlatButton(
               child: Text(
-                "VS Mode",
+                "대전 모드",
                 style: TextStyle(
                     fontSize: 30,
                     color: Colors.red,
@@ -136,5 +160,27 @@ class _SelectPageState extends State<SelectPage> {
         );
       },
     );
+  }
+
+  Future<void> choiceAction(String choice) async {
+    await permission('contacts');
+    friendPhoneNumber = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => GetContactPage()));
+    await _sendSMS();
+  }
+
+  Future<void> _sendSMS() async {
+    try {
+      await sendSMS(message: _url, recipients: [friendPhoneNumber]);
+      setState(() {});
+    } catch (error) {
+      setState(() {});
+    }
+  }
+
+  Future<void> permission(String choice) async {
+    if (choice == 'camera')
+      await Permission.camera.request();
+    else if (choice == 'contacts') await Permission.contacts.request();
   }
 }

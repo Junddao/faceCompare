@@ -1,4 +1,4 @@
-package com.example.facecompare
+package com.jtb.facecompare
 
 import io.flutter.embedding.android.FlutterActivity
 
