@@ -171,7 +171,9 @@ class _SelectPageState extends State<SelectPage> {
 
   Future<void> _sendSMS() async {
     try {
-      await sendSMS(message: _url, recipients: [friendPhoneNumber]);
+      String smsMessage = '인공지능 얼굴평가 앱 다운로드를 초대합니다.\n';
+      await sendSMS(
+          message: smsMessage + _url, recipients: [friendPhoneNumber]);
       setState(() {});
     } catch (error) {
       setState(() {});
