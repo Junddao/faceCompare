@@ -287,8 +287,8 @@ class _ComparePageState extends State<ComparePage> {
         // threshold: 0.1,
         // imageMean: 117.5, // defaults to 117.0
         // imageStd: 117.5, // defaults to 1.0
-        imageMean: 150.5, // defaults to 117.0
-        imageStd: 150.5, // defaults to 1.0
+        imageMean: 127.5, // defaults to 117.0
+        imageStd: 127.5, // defaults to 1.0
         numResults: 2, // defaults to 5
         threshold: 0.001, // defaults to 0.1
         asynch: true // defaults to true

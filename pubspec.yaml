@@ -38,6 +38,8 @@ dependencies:
   flutter_sms: 2.0.0+2
   contacts_service: ^0.3.10
   flutter_launcher_icons: ^0.7.5
+  camera: ^0.5.8+2
+  in_app_update: ^1.1.11
 
 
   # The following adds the Cupertino Icons font to your application.

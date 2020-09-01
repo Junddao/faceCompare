@@ -3,9 +3,11 @@ import 'package:facecompare/comparepage2.dart';
 import 'package:facecompare/data/appbarcontents.dart';
 import 'package:facecompare/getContactsPage.dart';
 import 'package:facecompare/manualpage.dart';
+import 'package:facecompare/video_test_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:gender_selection/gender_selection.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SelectPage extends StatefulWidget {
@@ -18,11 +20,25 @@ class _SelectPageState extends State<SelectPage> {
   String _url =
       'https://play.google.com/store/apps/details?id=com.jtb.facecompare';
   String friendPhoneNumber;
-  int selectedGender = 0; // 1 : man, 2 : women
+  int selectedGender; // 1 : man, 2 : women
 
   @override
   void initState() {
+    selectedGender = 0;
     super.initState();
+
+    InAppUpdate.checkForUpdate().then((update) {
+      if (update.updateAvailable) {
+        InAppUpdate.startFlexibleUpdate();
+      }
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -79,15 +95,22 @@ class _SelectPageState extends State<SelectPage> {
             padding: const EdgeInsets.all(3),
             size: 120, //default : 120
           ),
-          Container(
-            alignment: Alignment.center,
+          SizedBox(
+            width: double.infinity,
             child: FlatButton(
-              child: Text(
-                "싱글 모드",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w100),
+              child: Column(
+                // Replace with a Row for horizontal icon + text
+                children: <Widget>[
+                  Icon(Icons.person),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  Text(
+                    "싱글 모드",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100),
+                  ),
+                ],
               ),
               onPressed: () => (selectedGender == 0)
                   ? _showDialog(context)
@@ -99,15 +122,22 @@ class _SelectPageState extends State<SelectPage> {
                     ),
             ),
           ),
-          Container(
-            alignment: Alignment.center,
+          SizedBox(
+            width: double.infinity,
             child: FlatButton(
-              child: Text(
-                "대전 모드",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.red,
-                    fontWeight: FontWeight.w100),
+              child: Column(
+                // Replace with a Row for horizontal icon + text
+                children: <Widget>[
+                  Icon(Icons.people),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  Text(
+                    "대전 모드",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100),
+                  ),
+                ],
               ),
               onPressed: () => (selectedGender == 0)
                   ? _showDialog(context)
@@ -121,17 +151,51 @@ class _SelectPageState extends State<SelectPage> {
           Container(
             alignment: Alignment.center,
             child: FlatButton(
-              child: Text(
-                "참고 사항",
-                style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w100),
+              child: Column(
+                // Replace with a Row for horizontal icon + text
+                children: <Widget>[
+                  Icon(Icons.library_books),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  Text(
+                    "참고 사항",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100),
+                  ),
+                ],
               ),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ManualPage()),
               ),
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: FlatButton(
+              child: Column(
+                // Replace with a Row for horizontal icon + text
+                children: <Widget>[
+                  Icon(Icons.check_circle_outline),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  Text(
+                    "어플 정확성 확인",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w100),
+                  ),
+                ],
+              ),
+              onPressed: () => (selectedGender == 0)
+                  ? _showDialog(context)
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              VideoTestPage(selectedGender: selectedGender)),
+                    ),
             ),
           ),
         ],

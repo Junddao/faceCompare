@@ -22,8 +22,10 @@ class AdMobService {
   String getInterstitialAdId() {
     if (Platform.isIOS) {
     } else if (Platform.isAndroid) {
-      // return "ca-app-pub-9695790043722201/8889394257";
-      return "ca-app-pub-3940256099942544/1033173712";
+      // my admob
+      return "ca-app-pub-9695790043722201/8889394257";
+      // test admob
+      // return "ca-app-pub-3940256099942544/1033173712";
     }
     return null;
   }
