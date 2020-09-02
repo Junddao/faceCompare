@@ -1,14 +1,16 @@
 import 'dart:io';
 import 'package:facecompare/service/admob_service.dart';
+import 'package:facecompare/size_config.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:multi_charts/multi_charts.dart';
+
+import 'constants.dart';
 
 class ComparePage extends StatefulWidget {
-  final int selectedGender;
+  final bool selectedGender;
   ComparePage({Key key, @required this.selectedGender}) : super(key: key);
   @override
   _ComparePageState createState() => _ComparePageState();
@@ -31,14 +33,18 @@ class _ComparePageState extends State<ComparePage> {
   List<double> liResultScore = new List<double>();
   List<String> liResultTitle = new List<String>();
 
+  int score;
+  String rank;
+  String comment;
+
   @override
   void initState() {
-    if (widget.selectedGender == 1) {
+    if (widget.selectedGender == false) {
       mlModel = "assets/model_unquant1.tflite";
       mlLabel = "assets/labels1.txt";
-    } else if (widget.selectedGender == 2) {
-      mlModel = "assets/model_unquant2.tflite";
-      mlLabel = "assets/labels2.txt";
+    } else if (widget.selectedGender == true) {
+      mlModel = "assets/model_unquant3.tflite";
+      mlLabel = "assets/labels3.txt";
     }
     _isLoading = true;
     _visibleChart = false;
@@ -47,12 +53,12 @@ class _ComparePageState extends State<ComparePage> {
         _isLoading = false;
       });
     });
+    comment = '사진을 선택해주세요.';
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     final double statusBarHeight = MediaQuery.of(context).padding.top;
     return Scaffold(
       body: _isLoading
@@ -67,33 +73,182 @@ class _ComparePageState extends State<ComparePage> {
               children: <Widget>[
                 // Appbar 높이만큼 띄우기
                 Padding(padding: EdgeInsets.only(top: statusBarHeight + 5)),
-                Expanded(
-                  flex: 6,
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: size.width,
-                    height: size.width,
-                    child: _image == null
-                        ? Container()
-                        : Stack(children: <Widget>[
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: getImage(),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Container(
+                            height: 150,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    offset: Offset(0, 2),
+                                    blurRadius: 10,
+                                    color: Colors.grey,
+                                  )
+                                ]),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: RichText(
+                                    text: TextSpan(
+                                        style: kSubtitleTextSyule,
+                                        children: [
+                                          TextSpan(
+                                              text: 'Score',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                        ]),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 60,
+                                  left: 10,
+                                  child: RichText(
+                                    text: TextSpan(
+                                        style: kHeadingextStyle,
+                                        children: [
+                                          TextSpan(
+                                              text: score?.toString(),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          TextSpan(
+                                              text: ' / 100',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10)),
+                                        ]),
+                                  ),
+                                )
+                              ],
                             ),
-                          ]),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Container(
+                            height: 150,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    offset: Offset(0, 2),
+                                    blurRadius: 10,
+                                    color: Colors.grey,
+                                  )
+                                ]),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: RichText(
+                                    text: TextSpan(
+                                        style: kSubtitleTextSyule,
+                                        children: [
+                                          TextSpan(
+                                              text: 'Rank',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                        ]),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 60,
+                                  left: 10,
+                                  child: RichText(
+                                    text: TextSpan(
+                                        style: kHeadingextStyle,
+                                        children: [
+                                          TextSpan(
+                                              text: rank?.toString(),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                        ]),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 150,
+
+                            // height: SizeConfig.screenWidth * 0.5,
+                            child: _image == null
+                                ? Container()
+                                : Stack(children: <Widget>[
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: getImage(),
+                                    ),
+                                  ]),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
                 Expanded(
-                  flex: 4,
-                  child: percentIndicator(size, _output),
-                )
-
-                // _output == null
-                //     ? Text("")
-                //     : Text("${_output[0]["label"]}" +
-                //         "  " +
-                //         "${_output[0]["confidence"]}")
+                  flex: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              offset: Offset(0, 2),
+                              blurRadius: 10,
+                              color: Colors.grey,
+                            )
+                          ]),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 15,
+                            left: 10,
+                            child: RichText(
+                              text: TextSpan(
+                                  style: TextStyle(color: kTextColor),
+                                  children: [
+                                    TextSpan(
+                                        text: comment,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: percentIndicator(_output),
+                ),
               ],
             )),
       floatingActionButton: FloatingActionButton(
@@ -106,11 +261,9 @@ class _ComparePageState extends State<ComparePage> {
     );
   }
 
-  Widget percentIndicator(Size size, List output) {
+  Widget percentIndicator(List output) {
     List<double> liFaceScore = new List<double>();
     List<String> liFaceTitle = new List<String>();
-
-    String comment = "사진을 선택하세요.";
 
     //이전 결과값 초기화
     liResultScore.clear();
@@ -118,9 +271,15 @@ class _ComparePageState extends State<ComparePage> {
 
     liResultScore.add(0.0);
     liResultScore.add(0.0);
+    liResultScore.add(0.0);
+    liResultScore.add(0.0);
+    liResultScore.add(0.0);
 
-    liResultTitle.add("0 good");
-    liResultTitle.add("1 bad");
+    liResultTitle.add("sexy");
+    liResultTitle.add("cute");
+    liResultTitle.add("ruggedly");
+    liResultTitle.add("handsome");
+    liResultTitle.add("ugly");
 
     // 결과값 가져와서
     if (output != null) {
@@ -132,122 +291,84 @@ class _ComparePageState extends State<ComparePage> {
       //출력 리스트에 복사
       for (int i = 0; i < liResultTitle.length; i++) {
         for (int j = 0; j < liFaceTitle.length; j++) {
-          if (liResultTitle[i] == liFaceTitle[j]) {
-            liResultScore[i] = liFaceScore[j];
+          if (liFaceTitle[j].contains(liResultTitle[i])) {
+            liResultScore[i] = liFaceScore[j] * 100;
           }
         }
       }
-      if (liResultScore[0] > 0.9) {
-        comment = '상위 10% 입니다. 부럽네요! >_<';
-      } else if (liResultScore[0] > 0.7 && liResultScore[0] <= 0.9) {
-        comment = '여자 꽤 울리셨겠어~ ^_^';
-      } else if (liResultScore[0] > 0.5 && liResultScore[0] <= 0.7) {
-        comment = '나쁘지 않아 ~_~';
-      } else if (liResultScore[0] > 0.3 && liResultScore[0] <= 0.5) {
-        comment = '그저 그래 -_-';
-      } else {
-        comment = '김 묻었어요. 못생김! ㅠ_ㅠ';
+    }
+
+    // score 계산
+    calcScoreAndRank();
+
+    List<double> liChartValue = new List<double>();
+    for (var value in liResultScore) {
+      value += 2;
+      if (value + 2 > 100) value = 100;
+      liChartValue.add(value);
+    }
+    return new SafeArea(
+        child: Visibility(
+            visible: _visibleChart,
+            child: RadarChart(
+              values: liChartValue,
+              labels: ['섹시', '큐트', '남자다움', '잘생김', '못생김'],
+              maxValue: 100,
+              fillColor: Colors.redAccent,
+              chartRadiusFactor: 0.8,
+            )));
+  }
+
+  void calcScoreAndRank() {
+    double sum = 0.0;
+    for (int i = 0; i < liResultScore.length; i++) {
+      sum += liResultScore[i];
+    }
+    score = sum.round();
+    if (score >= 95)
+      rank = 'A+';
+    else if (score < 95 && score >= 90)
+      rank = 'A';
+    else if (score < 90 && score >= 85)
+      rank = 'B+';
+    else if (score < 85 && score >= 80)
+      rank = 'B';
+    else if (score < 80 && score >= 75)
+      rank = 'C+';
+    else if (score < 75 && score >= 70)
+      rank = 'C';
+    else if (score < 70 && score >= 65)
+      rank = 'D+';
+    else if (score < 65 && score >= 60)
+      rank = 'D';
+    else if (score < 60) rank = 'F';
+
+    double bestScore = 0;
+    int bestScoreItemIndex = 0;
+    for (int i = 0; i < liResultScore.length; i++) {
+      if (liResultScore[i] > bestScore) {
+        bestScore = liResultScore[i];
+        bestScoreItemIndex = i;
       }
     }
 
-    return new SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.all(20.0),
-            child: SizedBox(
-              width: 250.0,
-              child: TypewriterAnimatedTextKit(
-                  speed: Duration(milliseconds: 600),
-                  onTap: () {
-                    print("Tap Event");
-                  },
-                  text: [
-                    comment,
-                  ],
-                  textStyle: TextStyle(fontSize: 25.0, fontFamily: "Agne"),
-                  textAlign: TextAlign.start,
-                  alignment:
-                      AlignmentDirectional.topStart // or Alignment.topLeft
-                  ),
-            ),
-          ),
-          Visibility(
-            visible: _visibleChart,
-            child: SafeArea(
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Text("Good",
-                              style: new TextStyle(
-                                  foreground: Paint()..color = Colors.blue[500],
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold))),
-                      Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: new LinearPercentIndicator(
-                          width: size.width * 0.6,
-                          animationDuration: 1000,
-                          lineHeight: 30,
-                          percent: liResultScore[0],
-                          linearStrokeCap: LinearStrokeCap.roundAll,
-                          center: Text(
-                            (liResultScore[0] * 100).toStringAsFixed(1) + "%",
-                            style: new TextStyle(
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white,
-                            ),
-                          ),
-                          progressColor: Colors.blue[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text("Bad",
-                            style: new TextStyle(
-                                color: Colors.red[500],
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: new LinearPercentIndicator(
-                          width: size.width * 0.6,
-                          animation: true,
-                          animationDuration: 1000,
-                          lineHeight: 30,
-                          percent: liResultScore[1],
-                          linearStrokeCap: LinearStrokeCap.roundAll,
-                          center: Text(
-                            (liResultScore[1] * 100).toStringAsFixed(1) + "%",
-                            style: new TextStyle(
-                                color: Colors.white,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w300),
-                          ),
-                          progressColor: Colors.red[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    switch (bestScoreItemIndex) {
+      case 0:
+        comment = '이동욱, 유아인, 서인국과 닮은꼴 입니다.';
+        break;
+      case 1:
+        comment = '박보검, 헨리, 피오와 닮은꼴 입니다.';
+        break;
+      case 2:
+        comment = '하정우, 이병헌, 송승헌과 닮은꼴 입니다.';
+        break;
+      case 3:
+        comment = '장동건, 정우성, 원빈과 닮은꼴 입니다.';
+        break;
+      case 4:
+        comment = '그냥 못생겼습니다.';
+        break;
+    }
   }
 
   chooseImage(String select) async {

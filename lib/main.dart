@@ -20,6 +20,7 @@ void main() {
   });
 
   runApp(new MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: FaceCompare(),
   ));
 }
@@ -35,7 +36,7 @@ class _FaceCompareState extends State<FaceCompare> {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MaterialApp(
       color: Colors.grey,
-      title: 'Simple Lotto',
+      title: 'Face Compare',
       theme: ThemeData(
         primaryColor: Colors.white,
       ),

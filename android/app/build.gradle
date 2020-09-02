@@ -52,8 +52,8 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        versionCode 5
-        versionName "1.04"
+        versionCode 6
+        versionName "1.1"
     }
 
 

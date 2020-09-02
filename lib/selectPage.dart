@@ -1,12 +1,15 @@
 import 'package:facecompare/comparepage.dart';
 import 'package:facecompare/comparepage2.dart';
+import 'package:facecompare/constants.dart';
 import 'package:facecompare/data/appbarcontents.dart';
 import 'package:facecompare/getContactsPage.dart';
 import 'package:facecompare/manualpage.dart';
+import 'package:facecompare/model/category.dart';
+import 'package:facecompare/size_config.dart';
 import 'package:facecompare/video_test_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms/flutter_sms.dart';
-import 'package:gender_selection/gender_selection.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -20,11 +23,11 @@ class _SelectPageState extends State<SelectPage> {
   String _url =
       'https://play.google.com/store/apps/details?id=com.jtb.facecompare';
   String friendPhoneNumber;
-  int selectedGender; // 1 : man, 2 : women
+  bool selectedGender; // true : man, false : women
 
   @override
   void initState() {
-    selectedGender = 0;
+    selectedGender = true;
     super.initState();
 
     InAppUpdate.checkForUpdate().then((update) {
@@ -43,10 +46,11 @@ class _SelectPageState extends State<SelectPage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("선택", style: TextStyle(color: Colors.black)),
+        title: Text("Face Compare", style: TextStyle(color: Colors.black)),
         elevation: 0,
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -65,137 +69,158 @@ class _SelectPageState extends State<SelectPage> {
         ],
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        // crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          GenderSelection(
-            maleText: "남", //default Male
-            femaleText: "여", //default Female
-            linearGradient: LinearGradient(
-              colors: [
-                Colors.red,
-                Colors.green,
+          SizedBox(height: 30),
+          Container(
+            height: 130,
+            width: SizeConfig.screenWidth * 0.9,
+            child: Stack(
+              children: [
+                Positioned(
+                    child: Container(
+                  height: 90,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 2),
+                          blurRadius: 10,
+                          color: Colors.grey,
+                        )
+                      ]),
+                )),
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                      height: 80,
+                      width: 202,
+                      child: RichText(
+                        text: TextSpan(
+                            style: TextStyle(color: kTextColor),
+                            children: [
+                              TextSpan(
+                                  text: "성별을 선택하세요.",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            ]),
+                      )),
+                ),
+                Positioned(
+                  top: 50,
+                  left: 30,
+                  child: Container(
+                      height: 80,
+                      width: 202,
+                      child: RichText(
+                        text: TextSpan(
+                            style: TextStyle(color: kTextColor),
+                            children: [
+                              TextSpan(
+                                  text:
+                                      selectedGender == false ? 'Women' : "Man",
+                                  style: selectedGender == false
+                                      ? TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.red)
+                                      : TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.blue)),
+                            ]),
+                      )),
+                ),
+                Positioned(
+                  top: 30,
+                  right: 30,
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 500),
+                    height: 30.0,
+                    width: 80.0,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: selectedGender
+                            ? Colors.blueAccent[100].withOpacity(0.15)
+                            : Colors.redAccent[100].withOpacity(0.15)),
+                    child: Stack(
+                      children: [
+                        AnimatedPositioned(
+                          child: InkWell(
+                              onTap: selectedGenderButton,
+                              child: AnimatedSwitcher(
+                                  duration: Duration(milliseconds: 500),
+                                  transitionBuilder: (Widget child,
+                                      Animation<double> animation) {
+                                    return ScaleTransition(
+                                        scale: animation, child: child);
+                                  },
+                                  child: selectedGender
+                                      ? Icon(Icons.add_circle_outline,
+                                          color: Colors.blue,
+                                          size: 25.0,
+                                          key: UniqueKey())
+                                      : Icon(Icons.remove_circle_outline,
+                                          color: Colors.red,
+                                          size: 25.0,
+                                          key: UniqueKey()))),
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeIn,
+                          top: 3.0,
+                          left: selectedGender ? 40.0 : 0.0,
+                          right: selectedGender ? 0.0 : 40.0,
+                        )
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
-            femaleImage: AssetImage("assets/images/female.png"),
-            maleImage: AssetImage("assets/images/male.png"),
-
-            selectedGenderIconBackgroundColor: Colors.indigo, // default red
-            checkIconAlignment: Alignment.centerRight, // default bottomRight
-            selectedGenderCheckIcon: null, // default Icons.check
-            onChanged: (Gender gender) {
-              print(gender);
-              selectedGender = gender.index + 1;
-            },
-            equallyAligned: true,
-            animationDuration: Duration(milliseconds: 400),
-            isCircular: true, // default : true,
-            isSelectedGenderIconCircular: true,
-            opacityOfGradient: 0.6,
-            padding: const EdgeInsets.all(3),
-            size: 120, //default : 120
           ),
-          SizedBox(
-            width: double.infinity,
-            child: FlatButton(
-              child: Column(
-                // Replace with a Row for horizontal icon + text
-                children: <Widget>[
-                  Icon(Icons.person),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Text(
-                    "싱글 모드",
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100),
-                  ),
-                ],
-              ),
-              onPressed: () => (selectedGender == 0)
-                  ? _showDialog(context)
-                  : Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ComparePage(selectedGender: selectedGender)),
+          // SizedBox(height: 10),
+          Expanded(
+            child: StaggeredGridView.countBuilder(
+              padding: EdgeInsets.all(20),
+              crossAxisCount: 2,
+              itemCount: categories.length,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: EdgeInsets.all(20),
+                  height: index.isEven ? 200 : 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    image: DecorationImage(
+                      image: AssetImage(categories[index].image),
+                      fit: BoxFit.fill,
                     ),
-            ),
-          ),
-          SizedBox(
-            width: double.infinity,
-            child: FlatButton(
-              child: Column(
-                // Replace with a Row for horizontal icon + text
-                children: <Widget>[
-                  Icon(Icons.people),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Text(
-                    "대전 모드",
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: Offset(0, 2),
+                        blurRadius: 10,
+                        color: Colors.grey,
+                      )
+                    ],
                   ),
-                ],
-              ),
-              onPressed: () => (selectedGender == 0)
-                  ? _showDialog(context)
-                  : Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ComparePage2(selectedGender: selectedGender))),
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: FlatButton(
-              child: Column(
-                // Replace with a Row for horizontal icon + text
-                children: <Widget>[
-                  Icon(Icons.library_books),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Text(
-                    "참고 사항",
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100),
-                  ),
-                ],
-              ),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ManualPage()),
-              ),
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: FlatButton(
-              child: Column(
-                // Replace with a Row for horizontal icon + text
-                children: <Widget>[
-                  Icon(Icons.check_circle_outline),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Text(
-                    "어플 정확성 확인",
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w100),
-                  ),
-                ],
-              ),
-              onPressed: () => (selectedGender == 0)
-                  ? _showDialog(context)
-                  : Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              VideoTestPage(selectedGender: selectedGender)),
+                  child: InkWell(
+                    onTap: () => {openPage(context, index)},
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          categories[index].name,
+                          style: kTitleTextStyle,
+                        ),
+                      ],
                     ),
+                  ),
+                );
+              },
+              staggeredTileBuilder: (index) => StaggeredTile.fit(1),
             ),
           ),
         ],
@@ -203,28 +228,34 @@ class _SelectPageState extends State<SelectPage> {
     );
   }
 
-  void _showDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-          // title: new Text(""),
-          content: SingleChildScrollView(child: new Text("성별을 먼저 선택하세요.")),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
+  selectedGenderButton() {
+    setState(() {
+      selectedGender = !selectedGender;
+    });
   }
+
+  // void _showDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         shape:
+  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+  //         // title: new Text(""),
+  //         content: SingleChildScrollView(child: new Text("성별을 먼저 선택하세요.")),
+  //         actions: <Widget>[
+  //           new FlatButton(
+  //             child: new Text("Close"),
+  //             onPressed: () {
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> choiceAction(String choice) async {
     await permission('contacts');
@@ -248,5 +279,33 @@ class _SelectPageState extends State<SelectPage> {
     if (choice == 'camera')
       await Permission.camera.request();
     else if (choice == 'contacts') await Permission.contacts.request();
+  }
+
+  openPage(context, index) {
+    if (index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ComparePage(selectedGender: selectedGender)),
+      );
+    } else if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ComparePage2(selectedGender: selectedGender)),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ManualPage()),
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                VideoTestPage(selectedGender: selectedGender)),
+      );
+    }
   }
 }

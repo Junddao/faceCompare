@@ -7,7 +7,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'camera.dart';
 
 class VideoTestPage extends StatefulWidget {
-  final int selectedGender;
+  final bool selectedGender;
   VideoTestPage({Key key, @required this.selectedGender}) : super(key: key);
 
   @override
@@ -37,10 +37,10 @@ class _VideoTestPageState extends State<VideoTestPage> {
 
   @override
   void initState() {
-    if (widget.selectedGender == 1) {
+    if (widget.selectedGender == false) {
       mlModel = "assets/model_unquant1.tflite";
       mlLabel = "assets/labels1.txt";
-    } else if (widget.selectedGender == 2) {
+    } else if (widget.selectedGender == true) {
       mlModel = "assets/model_unquant2.tflite";
       mlLabel = "assets/labels2.txt";
     }
